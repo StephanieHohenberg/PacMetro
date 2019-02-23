@@ -1,20 +1,52 @@
-<!--The content below is only a placeholder and can be replaced.-->
-<div style="text-align:center">
-  <h1>
-    Welcome to {{ title }}!
-  </h1>
-  <img width="300" alt="Angular Logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTAgMjUwIj4KICAgIDxwYXRoIGZpbGw9IiNERDAwMzEiIGQ9Ik0xMjUgMzBMMzEuOSA2My4ybDE0LjIgMTIzLjFMMTI1IDIzMGw3OC45LTQzLjcgMTQuMi0xMjMuMXoiIC8+CiAgICA8cGF0aCBmaWxsPSIjQzMwMDJGIiBkPSJNMTI1IDMwdjIyLjItLjFWMjMwbDc4LjktNDMuNyAxNC4yLTEyMy4xTDEyNSAzMHoiIC8+CiAgICA8cGF0aCAgZmlsbD0iI0ZGRkZGRiIgZD0iTTEyNSA1Mi4xTDY2LjggMTgyLjZoMjEuN2wxMS43LTI5LjJoNDkuNGwxMS43IDI5LjJIMTgzTDEyNSA1Mi4xem0xNyA4My4zaC0zNGwxNy00MC45IDE3IDQwLjl6IiAvPgogIDwvc3ZnPg==">
+<script src="app.module.ts"></script>
+<div class="dashboard-container">
+  <h1>PAC-METRO</h1>
+  <p *ngIf="isSchematic"><span>Lives: {{numberOfLives}}  Score: {{score}}</span></p>
+  <small>
+    <span>{{pacman?.currentStation.name}}</span>&nbsp;
+    <span [style.background-color]="pacman?.currentLine.color" style="color:white">{{pacman?.currentLine.name}}  {{pacman?.currentLine.lastStationName}}</span>
+  </small>
+  <p>
+    <small>
+      <mat-slide-toggle
+        [checked]="isSchematic" (toggleChange)="changeCoordinatesMode()">schematic
+      </mat-slide-toggle>
+    </small>
+  </p>
 </div>
-<h2>Here are some links to help you start: </h2>
-<ul>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/tutorial">Tour of Heroes</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://angular.io/cli">CLI Documentation</a></h2>
-  </li>
-  <li>
-    <h2><a target="_blank" rel="noopener" href="https://blog.angular.io/">Angular blog</a></h2>
-  </li>
-</ul>
 
+<div class="map-container" #container>
+  <div class="map"
+       leaflet
+       [style.height]="container.offsetHeight"
+       [style.width]="container.offsetWidth"
+       [leafletOptions]="mapOptions"
+       [leafletCenter]="pacman?.marker.getLatLng()"
+       [leafletLayers]="layers"
+       [leafletZoom]="15">
+  </div>
+</div>
+
+<div class="input-container" *ngIf="!isSchematic">
+  <mat-form-field>
+    <input matInput [disabled]="isHandlingInput"
+           placeholder="Where do you wanna go?"
+           (change)="handleInput(input.value)" #input>
+  </mat-form-field>
+  <mat-spinner *ngIf="isHandlingInput" [diameter]="30"></mat-spinner>
+</div>
+
+<div class="loader-container" *ngIf="isLayerInitLoading">
+  <div>
+    <mat-spinner class="loader"></mat-spinner>
+  </div>
+</div>
+
+
+<div class="message-container" *ngIf="gameover || won">
+  <div>
+    <p *ngIf="gameover">Sorry. You are game over.</p>
+    <p *ngIf="won">Yeay. You won the game.</p>
+    <p *ngIf="isSchematic">Your score is {{score}}</p>
+  </div>
+</div>
